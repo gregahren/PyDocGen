@@ -9,9 +9,9 @@ from typing import Optional
 import click
 import yaml
 
-from config import Config
-from docstring_generator import DocstringGenerator
-from git_utils import get_modified_python_files
+from .config import Config
+from .docstring_generator import DocstringGenerator
+from .git_utils import get_modified_python_files
 
 PASS = 0
 FAIL = 1
