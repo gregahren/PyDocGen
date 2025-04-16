@@ -4,7 +4,7 @@ from pathlib import Path
 import astroid
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from config import Config
+from pydocgen.config import Config
 
 
 class DocstringGenerator:

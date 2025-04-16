@@ -5,3 +5,5 @@ and intelligently adds missing docstrings to modules, classes, and methods by an
 """
 
 __version__ = "0.1.0"
+
+from .cli import main
