@@ -9,9 +9,9 @@ from typing import Optional
 import click
 import yaml
 
-from .config import Config
-from .docstring_generator import DocstringGenerator
-from .git_utils import get_modified_python_files
+from config import Config
+from docstring_generator import DocstringGenerator
+from git_utils import get_modified_python_files
 
 PASS = 0
 FAIL = 1
@@ -79,6 +79,8 @@ def main(style, verbosity, config, exclude, include_private, filenames) -> int:
     Process Python files to add or update docstrings based on code analysis.
     If FILENAMES are not provided, will use git to find modified files.
     """
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+    
     # Load configuration
     config_dict = load_config(config)
     
