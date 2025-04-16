@@ -17,7 +17,7 @@ class DocstringGenerator:
             config (Config): Configuration for the docstring generator.
         """
         self.config = config
-        self.template_dir = Path(__file__).parent / "templates"
+        self.template_dir = Path("./pydocgen/templates")
         self.template_env = self._setup_templates()
         
     def _setup_templates(self) -> Environment:
