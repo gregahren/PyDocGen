@@ -1,0 +1,7 @@
+- id: pydocgen
+  name: PyDocGen - Automatic Python Docstring Generator
+  description: Automatically adds missing docstrings to Python files
+  entry: pydocgen
+  language: python
+  types: [python]
+  require_serial: true

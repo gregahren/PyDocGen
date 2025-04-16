@@ -1,0 +1,20 @@
+{{ summary }}{% if description or args or returns or raises %}{% if description %}
+
+
+{{ ' ' * col_offset }}{{ description }}
+
+{% endif %}{% if args %}
+
+
+{{ ' ' * col_offset }}Args:
+{% for arg in args %}{{ ' ' * col_offset }}    {{ arg.name }} ({{ arg.type }}{% if arg.default %}, optional{% endif %}): {{ arg.description }}{% if arg.default %} Defaults to {{ arg.default }}.{% endif %}
+
+{% endfor %}{% endif %}{% if returns %}
+
+{{ ' ' * col_offset }}Returns:
+{{ ' ' * col_offset }}    {{ returns.type }}: {{ returns.description }}
+{% endif %}{% if raises %}
+
+{{ ' ' * col_offset }}Raises:
+{% for exception in raises %}{{ ' ' * col_offset }}    {{ exception.type }}: {{ exception.description }}
+{% endfor %}{% endif %}{{ ' ' * col_offset }}{% endif %}

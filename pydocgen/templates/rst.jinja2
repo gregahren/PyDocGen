@@ -1,0 +1,11 @@
+{{ summary }}
+
+{% if description %}{{ description }}
+
+{% endif %}{% if args %}{% for arg in args %}:param {{ arg.name }}: {{ arg.description }}
+:type {{ arg.name }}: {{ arg.type }}{% if arg.default %}, optional{% endif %}
+{% endfor %}
+{% endif %}{% if returns %}:return: {{ returns.description }}
+:rtype: {{ returns.type }}
+{% endif %}{% if raises %}{% for exception in raises %}:raises {{ exception.type }}: {{ exception.description }}
+{% endfor %}{% endif %}
