@@ -61,7 +61,8 @@ def load_config(config_path: Optional[str] = None) -> dict:
 @click.option(
     "--exclude",
     multiple=True,
-    help="Patterns to exclude from processing (can be used multiple times)",
+    help="Patterns to exclude from processing (can be used multiple times). "
+         "Supports glob patterns like '*.py' or 'pydocgen/cli.py'.",
 )
 @click.option(
     "--include-private",
@@ -78,16 +79,34 @@ def main(style, verbosity, config, exclude, include_private, filenames) -> int:
     
     Process Python files to add or update docstrings based on code analysis.
     If FILENAMES are not provided, will use git to find modified files.
+    
+    Examples:
+        # Generate docstrings for all modified files except cli.py
+        $ pydocgen --exclude pydocgen/cli.py
+        
+        # Generate docstrings for specific files, excluding test files
+        $ pydocgen --exclude "tests/*.py" file1.py file2.py
+        
+        # Exclude multiple patterns
+        $ pydocgen --exclude "tests/*.py" --exclude "*_test.py" --exclude "pydocgen/cli.py"
     """
     
     # Load configuration
     config_dict = load_config(config)
     
+    # Combine exclude patterns from command line and config file
+    exclude_patterns = list(exclude)
+    if config_dict.get("exclude"):
+        # Add config file patterns if they're not already in the command line patterns
+        for pattern in config_dict.get("exclude", []):
+            if pattern not in exclude_patterns:
+                exclude_patterns.append(pattern)
+    
     # Create config object, prioritizing command-line arguments over config file
     config_obj = Config(
         style=style or config_dict.get("style", "google"),
         verbosity=verbosity or config_dict.get("verbosity", 2),
-        exclude=list(exclude) or config_dict.get("exclude", []),
+        exclude=exclude_patterns,
         include_private=include_private or config_dict.get("include_private", False),
     )
     
@@ -100,9 +119,23 @@ def main(style, verbosity, config, exclude, include_private, filenames) -> int:
     if not files_to_process:
         click.echo("No Python files to process.")
         return PASS
+        
+    # Create generator
+    generator = DocstringGenerator(config_obj)
+    
+    # Filter out excluded files
+    original_count = len(files_to_process)
+    files_to_process = [f for f in files_to_process if not generator.should_exclude_file(f)]
+    excluded_count = original_count - len(files_to_process)
+    
+    if excluded_count > 0:
+        click.echo(f"Excluded {excluded_count} file(s) based on exclusion patterns.")
+        
+    if not files_to_process:
+        click.echo("No files left to process after applying exclusion patterns.")
+        return PASS
     
     # Process files
-    generator = DocstringGenerator(config_obj)
     modified_files = 0
     
     with click.progressbar(
