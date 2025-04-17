@@ -82,9 +82,10 @@ class DocstringGenerator:
             config (Config): Configuration for the docstring generator.
         """
         self.config = config
-        self.template_dir = Path("./pydocgen/templates")
+        self.template_dir = Path(__file__).parent / "templates"
         self._ensure_templates_exist()
         self.template_env = self._setup_templates()
+        self._compile_exclude_patterns()
         
     def _ensure_templates_exist(self):
         """Ensure that template directory and files exist.
@@ -116,6 +117,68 @@ class DocstringGenerator:
         )
         return env
     
+    def _compile_exclude_patterns(self):
+        """Compile exclude patterns for file matching.
+        
+        Converts the exclude patterns from the config into a format that can be
+        used for efficient file path matching.
+        
+        Raises:
+            ValueError: If an exclude pattern is invalid.
+        """
+        import fnmatch
+        import re
+        
+        self.exclude_patterns = []
+        
+        if not self.config.exclude:
+            return
+            
+        for pattern in self.config.exclude:
+            if not pattern or not isinstance(pattern, str):
+                print(f"Warning: Ignoring invalid exclude pattern: {pattern}")
+                continue
+                
+            try:
+                # Convert glob pattern to regex pattern
+                regex_pattern = fnmatch.translate(pattern)
+                # Compile the regex for faster matching
+                compiled_pattern = re.compile(regex_pattern)
+                self.exclude_patterns.append(compiled_pattern)
+            except Exception as e:
+                print(f"Warning: Failed to compile exclude pattern '{pattern}': {e}")
+    
+    def should_exclude_file(self, file_path: Path) -> bool:
+        """Check if a file should be excluded from processing.
+        
+        Args:
+            file_path (Path): Path to the file to check.
+            
+        Returns:
+            bool: True if the file should be excluded, False otherwise.
+            
+        Raises:
+            ValueError: If the file path is invalid.
+        """
+        if file_path is None:
+            raise ValueError("File path cannot be None")
+            
+        # Convert to string for pattern matching
+        try:
+            file_path_str = str(file_path)
+        except Exception as e:
+            raise ValueError(f"Invalid file path: {e}")
+        
+        # Check against each exclude pattern
+        for pattern in self.exclude_patterns:
+            try:
+                if pattern.match(file_path_str):
+                    return True
+            except Exception as e:
+                # Log the error but continue with other patterns
+                print(f"Error matching pattern {pattern.pattern}: {e}")
+                
+        return False
     
     def process_file(self, file_path: Path) -> bool:
         """Process a Python file to add missing docstrings.
@@ -126,12 +189,16 @@ class DocstringGenerator:
         Returns:
             bool: True if the file was modified, False otherwise.
         """
+        # Skip excluded files
+        if self.should_exclude_file(file_path):
+            return False
+            
         try:
             with open(file_path, "r", encoding="utf-8") as f:
                 content = f.read()
                 
             # Parse the file with astroid for better analysis
-            module = astroid.parse(content, path=str(file_path))
+            module = astroid.parse(content, path=str(file_path), apply_transforms=False)
             
             # Check if module needs a docstring
             modified = False
