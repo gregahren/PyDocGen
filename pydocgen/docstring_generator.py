@@ -1,10 +1,75 @@
 """Docstring generator for PyDocGen."""
 from pathlib import Path
+import os
 
 import astroid
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from pydocgen.config import Config
+
+
+# Template content definitions
+GOOGLE_TEMPLATE = """{{ summary }}{% if description or args or returns or raises %}{% if description %}
+
+
+{{ ' ' * col_offset }}{{ description }}
+
+{% endif %}{% if args %}
+
+
+{{ ' ' * col_offset }}Args:
+{% for arg in args %}{{ ' ' * col_offset }}    {{ arg.name }} ({{ arg.type }}{% if arg.default %}, optional{% endif %}): {{ arg.description }}{% if arg.default %} Defaults to {{ arg.default }}.{% endif %}
+
+{% endfor %}{% endif %}{% if returns %}
+
+{{ ' ' * col_offset }}Returns:
+{{ ' ' * col_offset }}    {{ returns.type }}: {{ returns.description }}
+{% endif %}{% if raises %}
+
+{{ ' ' * col_offset }}Raises:
+{% for exception in raises %}{{ ' ' * col_offset }}    {{ exception.type }}: {{ exception.description }}
+{% endfor %}{% endif %}{{ ' ' * col_offset }}{% endif %}"""
+
+NUMPY_TEMPLATE = """{{ summary }}
+
+{% if description %}{{ description }}
+
+{% endif %}{% if args %}Parameters
+----------
+{% for arg in args %}{{ arg.name }} : {{ arg.type }}
+    {{ arg.description }}{% if arg.default %} Default is {{ arg.default }}.{% endif %}
+{% endfor %}
+{% endif %}{% if returns %}Returns
+-------
+{{ returns.type }}
+    {{ returns.description }}
+{% endif %}{% if raises %}Raises
+------
+{% for exception in raises %}{{ exception.type }}
+    {{ exception.description }}
+{% endfor %}{% endif %}"""
+
+RST_TEMPLATE = """{{ summary }}
+
+{% if description %}{{ description }}
+
+{% endif %}{% if args %}{% for arg in args %}:param {{ arg.name }}: {{ arg.description }}
+:type {{ arg.name }}: {{ arg.type }}{% if arg.default %}, optional{% endif %}
+{% endfor %}
+{% endif %}{% if returns %}:return: {{ returns.description }}
+:rtype: {{ returns.type }}
+{% endif %}{% if raises %}{% for exception in raises %}:raises {{ exception.type }}: {{ exception.description }}
+{% endfor %}{% endif %}"""
+
+INIT_TEMPLATE = """\"\"\"Templates package for PyDoGen.\"\"\""""
+
+# Template mapping
+TEMPLATES = {
+    "google.jinja2": GOOGLE_TEMPLATE,
+    "numpy.jinja2": NUMPY_TEMPLATE,
+    "rst.jinja2": RST_TEMPLATE,
+    "__init__.py": INIT_TEMPLATE
+}
 
 
 class DocstringGenerator:
@@ -18,8 +83,25 @@ class DocstringGenerator:
         """
         self.config = config
         self.template_dir = Path("./pydocgen/templates")
+        self._ensure_templates_exist()
         self.template_env = self._setup_templates()
         
+    def _ensure_templates_exist(self):
+        """Ensure that template directory and files exist.
+        
+        Creates the template directory and files if they don't exist.
+        This ensures the templates are available in production environments.
+        """
+        # Create template directory if it doesn't exist
+        os.makedirs(self.template_dir, exist_ok=True)
+        
+        # Create template files if they don't exist
+        for filename, content in TEMPLATES.items():
+            file_path = self.template_dir / filename
+            if not file_path.exists():
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(content)
+    
     def _setup_templates(self) -> Environment:
         """Set up Jinja2 templates for docstring generation.
         
