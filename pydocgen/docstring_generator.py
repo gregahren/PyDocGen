@@ -17,7 +17,9 @@ GOOGLE_TEMPLATE = """{{ summary }}{% if description or args or returns or raises
 
 
 Args:
-{% for arg in args %}    {{ arg.name }} ({{ arg.type }}{% if arg.default %}, optional{% endif %}): {{ arg.description }}{% if arg.default %} Defaults to {{ arg.default }}.{% endif %}
+{% for arg in args %}
+    {{ arg.name }} ({{ arg.type }}{% if arg.default %}, optional{% endif %}): {{ arg.description }}{% if arg.default %} Defaults to {{ arg.default }}.{% endif %}
+
 {% endfor %}{% endif %}{% if returns %}
 
 
