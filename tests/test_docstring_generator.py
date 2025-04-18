@@ -1,5 +1,3 @@
-"""Tests for the docstring generator."""
-
 import os
 import tempfile
 import unittest
@@ -10,10 +8,7 @@ from pydocgen.docstring_generator import DocstringGenerator
 
 
 class TestDocstringGenerator(unittest.TestCase):
-    """Test cases for the DocstringGenerator class."""
-
     def setUp(self):
-        """Set up test fixtures."""
         self.config = Config(
             style="google",
             verbosity=2,
@@ -26,11 +21,9 @@ class TestDocstringGenerator(unittest.TestCase):
         self.temp_dir = tempfile.TemporaryDirectory()
         
     def tearDown(self):
-        """Tear down test fixtures."""
         self.temp_dir.cleanup()
         
     def test_process_file_with_missing_docstrings(self):
-        """Test processing a file with missing docstrings."""
         # Create a test file with missing docstrings
         test_file_content = """
 def add(a, b):
@@ -63,7 +56,6 @@ class TestClass:
         self.assertIn('"""Get name.', modified_content)
         
     def test_process_file_with_existing_docstrings(self):
-        """Test processing a file with existing docstrings."""
         # Create a test file with existing docstrings
         test_file_content = '''
 def add(a, b):
@@ -114,8 +106,7 @@ class TestClass:
         # Check that the content is unchanged
         self.assertEqual(content, test_file_content)
         
-    def test_different_docstring_styles(self):
-        """Test generating docstrings in different styles."""
+    def test_different_docstring_styles(self, a:str, b:int, c:list[int]):
         # Create a test file
         test_file_content = """
 def add(a: int, b: int) -> int:
