@@ -1,6 +1,6 @@
 style: google
 verbosity: 2
 exclude:
-  - tests\*
-  - setup.py
+  - "*tests/*"
+  - "*setup.py"
 include_private: false
