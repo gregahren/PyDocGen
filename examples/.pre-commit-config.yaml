@@ -1,18 +1,10 @@
 # Sample pre-commit configuration for PyDocGen Hook
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
-    hooks:
-    -   id: trailing-whitespace
-    -   id: end-of-file-fixer
-    -   id: check-yaml
-    -   id: check-added-large-files
-
--   repo: https://github.com/yourusername/pydocgen
-    rev: v0.1.0  # Use the latest version
+-   repo: https://github.com/gregahren/pydocgen
+    rev: 0.1.0  # Use the latest version
     hooks:
     -   id: pydocgen
-        args: [--style=google]  # Optional: specify docstring style
+        args: [--style=google]  # Optional: specify docstring style, e.g., google, numpy, or rst
         # Additional arguments:
         # --include-private     # Include private methods
         # --config=.pydocgen.yaml  # Path to config file

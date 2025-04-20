@@ -31,7 +31,7 @@ pip install pre-commit
 ```yaml
 repos:
 -   repo: https://github.com/yourusername/pydocgen
-    rev: 0.1.2  # Use the latest version
+    rev: 0.1.0  # Use the latest version
     hooks:
     -   id: pydocgen
         args: [--style=google]  # Optional: specify docstring style
