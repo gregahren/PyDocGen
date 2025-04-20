@@ -68,7 +68,7 @@ include_private: false
 
 ## Examples
 
-![Generating Python docstrings](assets/image.png)
+![Generating Python docstrings](assets/example1.png)
 
 ### Google Style Docstring
 
