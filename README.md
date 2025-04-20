@@ -7,7 +7,6 @@ A pre-commit hook that automatically detects changes in Python files and intelli
 - Automatically detects Python files changed in a commit
 - Intelligently generates contextually relevant docstrings by analyzing code
 - Supports multiple docstring styles (Google, NumPy, reStructuredText)
-- Configurable verbosity levels and docstring format
 - Handles edge cases gracefully
 - Easy integration with any Python project's Git workflow
 
@@ -32,7 +31,7 @@ pip install pre-commit
 ```yaml
 repos:
 -   repo: https://github.com/yourusername/pydocgen
-    rev: v0.1.0  # Use the latest version
+    rev: 0.1.2  # Use the latest version
     hooks:
     -   id: pydocgen
         args: [--style=google]  # Optional: specify docstring style
@@ -51,7 +50,6 @@ PyDocGen can be configured using command-line arguments or a configuration file.
 ### Command-line Arguments
 
 - `--style`: Docstring style (google, numpy, rst). Default: google
-- `--verbosity`: Level of detail in docstrings (1-3). Default: 2
 - `--config`: Path to configuration file
 - `--exclude`: Patterns to exclude from processing
 - `--include-private`: Include private methods (prefixed with _)
@@ -62,10 +60,9 @@ Create a `.pydocgen.yaml` file in your project root:
 
 ```yaml
 style: google
-verbosity: 2
 exclude:
-  - tests/*
-  - setup.py
+  - "*tests/*"
+  - "setup.py"
 include_private: false
 ```
 

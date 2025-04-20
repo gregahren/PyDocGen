@@ -31,7 +31,6 @@ class TestCLI(unittest.TestCase):
         with open(config_path, "w") as f:
             f.write("""
 style: numpy
-verbosity: 3
 exclude:
   - tests/*
   - setup.py
@@ -40,7 +39,6 @@ include_private: true
         
         config = load_config(str(config_path))
         self.assertEqual(config["style"], "numpy")
-        self.assertEqual(config["verbosity"], 3)
         self.assertEqual(config["exclude"], ["tests/*", "setup.py"])
         self.assertTrue(config["include_private"])
     
@@ -54,7 +52,6 @@ include_private: true
             with open(".pydocgen.yaml", "w") as f:
                 f.write("""
 style: rst
-verbosity: 1
 exclude:
   - tests/*
 include_private: false
@@ -62,7 +59,6 @@ include_private: false
             
             config = load_config()
             self.assertEqual(config["style"], "rst")
-            self.assertEqual(config["verbosity"], 1)
             self.assertEqual(config["exclude"], ["tests/*"])
             self.assertFalse(config["include_private"])
         finally:
@@ -115,7 +111,6 @@ include_private: false
             
             result = self.runner.invoke(main, [
                 '--style', 'numpy',
-                '--verbosity', '3',
                 '--include-private',
                 '--exclude', 'tests/*',
                 str(test_file)
@@ -127,7 +122,6 @@ include_private: false
             # Check that the Config object was created with the right parameters
             config = mock_generator_class.call_args[0][0]
             self.assertEqual(config.style, "numpy")
-            self.assertEqual(config.verbosity, 3)
             self.assertEqual(config.exclude, ["tests/*"])
             self.assertTrue(config.include_private)
 

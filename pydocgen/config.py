@@ -10,14 +10,12 @@ class Config:
     
     Attributes:
         style (str): Docstring style (google, numpy, rst).
-        verbosity (int): Level of detail in docstrings (1-3).
         exclude (List[str]): Glob patterns to exclude from processing.
             Examples: ["tests/*.py", "pydocgen/cli.py", "*_test.py"]
         include_private (bool): Whether to include private methods (prefixed with _).
     """
 
     style: str = "google"
-    verbosity: int = 2
     exclude: List[str] = None
     include_private: bool = False
 

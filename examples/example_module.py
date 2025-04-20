@@ -60,6 +60,7 @@ def process_file(file_path: str, output_dir=None, overwrite=False) -> str:
 
 
 def filter_data(data, criteria:str=None, sort_by=None, limit=None) -> List[Dict]:
+    
     result = data.copy()
     
     if criteria:

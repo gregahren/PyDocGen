@@ -48,12 +48,6 @@ def load_config(config_path: Optional[str] = None) -> dict:
     help="Docstring style (default: google)",
 )
 @click.option(
-    "--verbosity",
-    type=click.IntRange(1, 3),
-    default=2,
-    help="Level of detail in docstrings (1-3, default: 2)",
-)
-@click.option(
     "--config",
     type=click.Path(exists=False),
     help="Path to configuration file",
@@ -74,7 +68,7 @@ def load_config(config_path: Optional[str] = None) -> dict:
     nargs=-1,
     type=click.Path(exists=True),
 )
-def main(style, verbosity, config, exclude, include_private, filenames) -> int:
+def main(style, config, exclude, include_private, filenames) -> int:
     """PyDocGen - Automatic Python Docstring Generator.
     
     Process Python files to add or update docstrings based on code analysis.
@@ -105,7 +99,6 @@ def main(style, verbosity, config, exclude, include_private, filenames) -> int:
     # Create config object, prioritizing command-line arguments over config file
     config_obj = Config(
         style=style or config_dict.get("style", "google"),
-        verbosity=verbosity or config_dict.get("verbosity", 2),
         exclude=exclude_patterns,
         include_private=include_private or config_dict.get("include_private", False),
     )

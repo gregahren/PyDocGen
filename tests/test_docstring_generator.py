@@ -11,7 +11,6 @@ class TestDocstringGenerator(unittest.TestCase):
     def setUp(self):
         self.config = Config(
             style="google",
-            verbosity=2,
             exclude=[],
             include_private=False,
         )

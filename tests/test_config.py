@@ -15,7 +15,6 @@ class TestConfig(unittest.TestCase):
         """Test that default values are set correctly."""
         config = Config()
         self.assertEqual(config.style, "google")
-        self.assertEqual(config.verbosity, 2)
         self.assertEqual(config.exclude, [])
         self.assertFalse(config.include_private)
     
@@ -23,12 +22,10 @@ class TestConfig(unittest.TestCase):
         """Test that custom values are set correctly."""
         config = Config(
             style="numpy",
-            verbosity=3,
             exclude=["tests/*", "setup.py"],
             include_private=True,
         )
         self.assertEqual(config.style, "numpy")
-        self.assertEqual(config.verbosity, 3)
         self.assertEqual(config.exclude, ["tests/*", "setup.py"])
         self.assertTrue(config.include_private)
     
