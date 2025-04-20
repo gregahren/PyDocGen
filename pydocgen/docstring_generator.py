@@ -22,11 +22,9 @@ Args:
 
 {% endfor %}{% endif %}{% if returns %}
 
-
 Returns:
     {{ returns.type }}: {{ returns.description }}
 {% endif %}{% if raises %}
-
 
 Raises:
 {% for exception in raises %}    {{ exception.type }}: {{ exception.description }}

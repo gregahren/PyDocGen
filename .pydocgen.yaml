@@ -1,5 +1,4 @@
-style: google
-verbosity: 2
+style: numpy
 exclude:
   - "*tests/*"
   - "*setup.py"

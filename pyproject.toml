@@ -27,6 +27,11 @@ dependencies = [
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
+[dependency-groups]
+dev = [
+    "pre-commit>=4.2.0",
+]
+
 [project.urls]
 Homepage = "https://github.com/yourusername/pydocgen"
 

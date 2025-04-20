@@ -1,0 +1,12 @@
+# Sample pre-commit configuration for PyDocGen Hook
+repos:
+-   repo: local
+    hooks:
+    -   id: pydocgen
+        name: Generate docstrings for Python files
+        entry: pydocgen
+        language: python
+        args: [--style=google]  # Optional: specify docstring style
+        # Additional arguments:
+        # --include-private     # Include private methods
+        # --config=.pydocgen.yaml  # Path to config file
