@@ -1,11 +1,17 @@
-{{ summary }}
+{{ summary }}{% if description or args or returns or raises %}{% if description %}
 
-{% if description %}{{ description }}
 
-{% endif %}{% if args %}{% for arg in args %}:param {{ arg.name }}: {{ arg.description }}
+{{ description }}{% endif %}{% if args %}
+
+
+{% for arg in args %}:param {{ arg.name }}: {{ arg.description }}
 :type {{ arg.name }}: {{ arg.type }}{% if arg.default %}, optional{% endif %}
-{% endfor %}
-{% endif %}{% if returns %}:return: {{ returns.description }}
+
+{% endfor %}{% endif %}{% if returns %}
+
+:return: {{ returns.description }}
 :rtype: {{ returns.type }}
-{% endif %}{% if raises %}{% for exception in raises %}:raises {{ exception.type }}: {{ exception.description }}
-{% endfor %}{% endif %}
+{% endif %}{% if raises %}
+
+{% for exception in raises %}:raises {{ exception.type }}: {{ exception.description }}
+{% endfor %}{% endif %}{% endif %}

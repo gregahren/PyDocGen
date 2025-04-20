@@ -30,36 +30,48 @@ Raises:
 {% for exception in raises %}    {{ exception.type }}: {{ exception.description }}
 {% endfor %}{% endif %}{% endif %}"""
 
-NUMPY_TEMPLATE = """{{ summary }}
+NUMPY_TEMPLATE = """{{ summary }}{% if description or args or returns or raises %}{% if description %}
 
-{% if description %}{{ description }}
 
-{% endif %}{% if args %}Parameters
+{{ description }}{% endif %}{% if args %}
+
+
+Parameters
 ----------
 {% for arg in args %}{{ arg.name }} : {{ arg.type }}
     {{ arg.description }}{% if arg.default %} Default is {{ arg.default }}.{% endif %}
-{% endfor %}
-{% endif %}{% if returns %}Returns
+
+{% endfor %}{% endif %}{% if returns %}
+
+Returns
 -------
 {{ returns.type }}
     {{ returns.description }}
-{% endif %}{% if raises %}Raises
+{% endif %}{% if raises %}
+
+Raises
 ------
 {% for exception in raises %}{{ exception.type }}
     {{ exception.description }}
-{% endfor %}{% endif %}"""
+{% endfor %}{% endif %}{% endif %}"""
 
-RST_TEMPLATE = """{{ summary }}
+RST_TEMPLATE = """{{ summary }}{% if description or args or returns or raises %}{% if description %}
 
-{% if description %}{{ description }}
 
-{% endif %}{% if args %}{% for arg in args %}:param {{ arg.name }}: {{ arg.description }}
+{{ description }}{% endif %}{% if args %}
+
+
+{% for arg in args %}:param {{ arg.name }}: {{ arg.description }}
 :type {{ arg.name }}: {{ arg.type }}{% if arg.default %}, optional{% endif %}
-{% endfor %}
-{% endif %}{% if returns %}:return: {{ returns.description }}
+
+{% endfor %}{% endif %}{% if returns %}
+
+:return: {{ returns.description }}
 :rtype: {{ returns.type }}
-{% endif %}{% if raises %}{% for exception in raises %}:raises {{ exception.type }}: {{ exception.description }}
-{% endfor %}{% endif %}"""
+{% endif %}{% if raises %}
+
+{% for exception in raises %}:raises {{ exception.type }}: {{ exception.description }}
+{% endfor %}{% endif %}{% endif %}"""
 
 INIT_TEMPLATE = """\"\"\"Templates package for PyDoGen.\"\"\""""
 
@@ -475,10 +487,7 @@ class DocstringGenerator:
                 elif isinstance(arg.annotation, ast.Attribute):
                     arg_type = f"{arg.annotation.value.id}.{arg.annotation.attr}"
                 elif isinstance(arg.annotation, ast.Subscript):
-                    if isinstance(arg.annotation.value, ast.Name):
-                        arg_type = f"{arg.annotation.value.id}[...]"
-                    else:
-                        arg_type = "complex_type"
+                    arg_type = self._get_type_annotation(arg.annotation)
             
             # Try to infer default value
             default = None
@@ -511,10 +520,7 @@ class DocstringGenerator:
             elif isinstance(node.returns, ast.Attribute):
                 return_type = f"{node.returns.value.id}.{node.returns.attr}"
             elif isinstance(node.returns, ast.Subscript):
-                if isinstance(node.returns.value, ast.Name):
-                    return_type = f"{node.returns.value.id}[...]"
-                else:
-                    return_type = "complex_type"
+                return_type = self._get_type_annotation(node.returns)
             
             # Generate return description based on function name and return type
             return_description = f"The {'result' if not func_name.startswith('get') else func_name[4:]}."
@@ -565,6 +571,58 @@ class DocstringGenerator:
         # Process all child nodes
         for child in ast.iter_child_nodes(node):
             self._add_parent_references(child, node)
+    
+    def _get_type_annotation(self, node):
+        """Extract the full type annotation from an AST node.
+        
+        Args:
+            node: The AST node containing type information.
+            
+        Returns:
+            str: The extracted type annotation as a string.
+        """
+        if isinstance(node, ast.Name):
+            return node.id
+        elif isinstance(node, ast.Attribute):
+            return f"{self._get_type_annotation(node.value)}.{node.attr}"
+        elif isinstance(node, ast.Subscript):
+            # Handle subscript types like List[int], Dict[str, int], etc.
+            base_type = self._get_type_annotation(node.value)
+            
+            # Extract the slice information
+            if hasattr(node, 'slice'):
+                slice_node = node.slice
+                
+                # Python 3.9+ uses plain nodes for slices
+                if isinstance(slice_node, ast.Tuple):
+                    # Handle multiple parameters like Dict[str, int]
+                    params = []
+                    for elt in slice_node.elts:
+                        params.append(self._get_type_annotation(elt))
+                    slice_str = ", ".join(params)
+                    return f"{base_type}[{slice_str}]"
+                else:
+                    # Handle single parameter like List[int]
+                    return f"{base_type}[{self._get_type_annotation(slice_node)}]"
+            
+            # Python 3.8 and earlier use Index and other slice types
+            elif hasattr(node, 'slice') and hasattr(node.slice, 'value'):
+                if isinstance(node.slice.value, ast.Tuple):
+                    # Handle multiple parameters like Dict[str, int]
+                    params = []
+                    for elt in node.slice.value.elts:
+                        params.append(self._get_type_annotation(elt))
+                    slice_str = ", ".join(params)
+                    return f"{base_type}[{slice_str}]"
+                else:
+                    # Handle single parameter like List[int]
+                    return f"{base_type}[{self._get_type_annotation(node.slice.value)}]"
+            
+            # Fallback for complex or unsupported slice structures
+            return f"{base_type}[...]"
+        
+        # Fallback for other node types
+        return "complex_type"
     
     def _recursive_nodes_of_type(self, node, node_type):
         """Recursively find all nodes of a specific type in the AST.

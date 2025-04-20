@@ -6,7 +6,8 @@ repos:
         name: Generate docstrings for Python files
         entry: pydocgen
         language: python
-        args: [--style=google]  # Optional: specify docstring style
+        args: [--config=.pydocgen.yaml]  # Optional: specify docstring style
         # Additional arguments:
+        # --style=google       # Google style docstrings
         # --include-private     # Include private methods
         # --config=.pydocgen.yaml  # Path to config file

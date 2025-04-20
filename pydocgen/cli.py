@@ -98,9 +98,9 @@ def main(style, config, exclude, include_private, filenames) -> int:
     
     # Create config object, prioritizing command-line arguments over config file
     config_obj = Config(
-        style=style or config_dict.get("style", "google"),
+        style=config_dict.get("style", style or "google"),
         exclude=exclude_patterns,
-        include_private=include_private or config_dict.get("include_private", False),
+        include_private=config_dict.get("include_private", include_private or False),
     )
     
     # Get files to process

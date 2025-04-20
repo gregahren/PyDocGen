@@ -1,4 +1,4 @@
-# PyDocGen Hook
+# PyDocGen Pre-Commit Hook
 
 A pre-commit hook that automatically detects changes in Python files and intelligently adds missing docstrings to modules, classes, and methods by analyzing their code.
 
@@ -67,6 +67,8 @@ include_private: false
 ```
 
 ## Examples
+
+![Generating Python docstrings](assets/image.png)
 
 ### Google Style Docstring
 
